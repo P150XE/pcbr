@@ -1,0 +1,879 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bear Hunt Almanac</title>
+<meta name="description" content="A complete Kingshot Bear Hunt guide: how to join rallies, the only skill that counts, hero picks, the avoid tier, the multiplicative damage math, rally balancing and troop formations.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Pacbear UI Dark Premium Theme Integration */
+  --parch:      #111625;   /* Pacbear BG */
+  --parch-2:    #161b26;   /* Pacbear Input/Alt BG */
+  --parch-edge: #242c3d;   /* Pacbear Border */
+  --ink:        #ffffff;   /* Text Headings */
+  --ink-soft:   #c9d1d9;   /* Text Primary Body */
+  --ink-faint:  #8b9bb4;   /* Text Muted */
+  
+  /* Brand accents */
+  --gold:        #00f2fe;   /* Neon Cyan */
+  --gold-deep:  #3db2ff;   /* Neon Blue */
+  --gold-bright: #00f2fe;
+  --ember:      #ff4b4b;   /* Crimson Red */
+  --ember-br:    #ff4b4b;
+  --iron:        #161b26;
+  --iron-2:      #1a2133;
+  --iron-3:      #283247;
+  --royal:      #b337ff;   /* Archery Purple */
+  
+  /* Troop runes colors */
+  --inf:         #ff4b4b;   /* Infantry - Red */
+  --arc:         #b337ff;   /* Archer - Purple */
+  --cav:         #0bc5ea;   /* Cavalry - Blue */
+  
+  /* Rarity tiers */
+  --t-grey:   #5d6b82;
+  --t-green:  #5cb85c;
+  --t-blue:   #0bc5ea;
+  --t-purple: #b337ff;
+
+  --maxw: 1180px;
+  --gap: clamp(1rem, 3vw, 2.6rem);
+  --ease: cubic-bezier(.16,1,.3,1);
+
+  --fs-body: clamp(1.02rem, 0.97rem + 0.32vw, 1.2rem);
+  --fs-lead: clamp(1.18rem, 1.05rem + 0.7vw, 1.6rem);
+  --fs-h2:   clamp(2rem, 1.3rem + 3.1vw, 3.7rem);
+  --fs-h3:   clamp(1.3rem, 1.05rem + 1.1vw, 1.95rem);
+  --fs-mega: clamp(3.2rem, 1.4rem + 9vw, 8.5rem);
+
+  --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+body{
+  font-family:"Spectral",Georgia,serif;
+  font-size:var(--fs-body);
+  line-height:1.62;
+  color:var(--ink-soft);
+  background:var(--parch);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+img{display:block;max-width:100%;height:auto}
+
+.grain::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:var(--noise);
+  background-size:220px 220px;
+  mix-blend-mode:overlay;opacity:.03;z-index:1;
+}
+
+h1,h2,h3,.cz{font-family:"Cinzel",serif;font-weight:700;letter-spacing:.01em;line-height:1.06;color:var(--ink)}
+strong,b{font-weight:700;color:var(--ink)}
+em{font-style:italic}
+a{color:var(--gold)}
+
+.wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:clamp(1.1rem,4vw,2.4rem)}
+
+/* ============ reading progress ============ */
+#progress{position:fixed;inset:0 auto auto 0;height:3px;width:0;z-index:120;
+  background:linear-gradient(90deg,var(--gold-deep),var(--gold-bright));
+  box-shadow:0 0 12px rgba(0, 242, 254, 0.6);}
+
+/* ============ sticky chapter bar ============ */
+#bar{position:fixed;top:0;left:0;right:0;z-index:110;
+  display:flex;align-items:center;gap:1.1rem;min-height:46px;
+  padding:.5rem clamp(1rem,4vw,2.2rem);padding-right:clamp(4rem,18vw,9rem);
+  background:rgba(26, 33, 51, 0.95);
+  backdrop-filter:blur(10px) saturate(1.2);
+  border-bottom:1px solid rgba(0, 242, 254, 0.2);
+  transform:translateY(-110%);transition:transform .5s var(--ease);
+  color:var(--ink);
+}
+#bar.show{transform:none}
+#bar .crest{height:26px;width:auto;}
+#bar .btitle{font-family:"Cinzel";font-weight:700;font-size:.86rem;letter-spacing:.12em;color:var(--gold-bright);white-space:nowrap}
+#bar nav{margin-left:auto;display:flex;gap:.2rem;flex-wrap:wrap}
+#bar nav a{font-family:"Cinzel";font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
+  text-decoration:none;color:var(--ink-faint);padding:.35rem .55rem;border-radius:6px;transition:.2s}
+#bar nav a:hover{color:var(--gold);background:rgba(0, 242, 254, 0.1)}
+@media(max-width:760px){#bar nav{display:none}}
+
+/* ============ HERO ============ */
+.hero{position:relative;min-height:100svh;display:grid;align-items:center;
+  background:
+    radial-gradient(120% 90% at 78% 18%, rgba(0, 242, 254, 0.15), transparent 55%),
+    radial-gradient(90% 70% at 12% 92%, rgba(255, 75, 75, 0.1), transparent 60%),
+    linear-gradient(160deg, var(--iron-2), var(--parch) 60%, #0a0e1a);
+  color:var(--ink);overflow:hidden;isolation:isolate;}
+.hero::before{content:"";position:absolute;inset:0;background-image:var(--noise);
+  background-size:240px 240px;opacity:.05;mix-blend-mode:overlay;z-index:0}
+.hero::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  box-shadow:inset 0 -120px 120px -60px var(--parch);}
+.hero .wrap{position:relative;z-index:3;display:grid;grid-template-columns:1.15fr .85fr;
+  align-items:center;gap:clamp(1rem,4vw,3rem);width:100%;padding-block:clamp(5rem,12vh,9rem)}
+.hero-text{max-width:34ch}
+.kicker{display:inline-flex;align-items:center;gap:.7rem;margin-bottom:1.4rem}
+.kicker img{height:34px}
+.kicker span{font-family:"Cinzel";font-weight:600;letter-spacing:.34em;font-size:.72rem;
+  text-transform:uppercase;color:var(--gold);padding-left:.2rem}
+.hero h1{font-size:var(--fs-mega);font-weight:900;letter-spacing:0;text-wrap:balance}
+.hero h1 .word{display:inline-block;padding:0 .1em .08em 0;
+  color:transparent;background:
+    linear-gradient(180deg, var(--gold-bright) 8%, var(--gold-deep) 96%);
+  -webkit-background-clip:text;background-clip:text;
+  filter:drop-shadow(0 14px 30px rgba(0, 242, 254, 0.2));}
+.hero h1 .small{display:block;font-size:.32em;letter-spacing:.42em;font-weight:600;
+  color:var(--ink);background:none;filter:none;
+  margin-bottom:.45em;padding-left:.3em;opacity:.82}
+.hero .blurb{font-size:var(--fs-lead);color:var(--ink-soft);margin-top:1.5rem;font-weight:400;
+  line-height:1.4;max-width:30ch}
+.byline{margin-top:2rem;display:flex;align-items:center;gap:.85rem;font-size:.95rem;color:var(--ink-faint)}
+.byline .seal{height:42px;width:42px;border-radius:50%;flex:none;
+  display:grid;place-items:center;font-family:"Cinzel";font-weight:800;font-size:1rem;
+  color:#111625;background:linear-gradient(135deg, var(--gold-bright), var(--gold-deep));
+  box-shadow:0 2px 10px rgba(0,0,0,.4)}
+.byline b{color:var(--gold);font-family:"Cinzel";font-weight:600;letter-spacing:.04em}
+.hero-art{position:relative;justify-self:center}
+.hero-art .glow{position:absolute;inset:-14% -8% -10% -8%;z-index:-1;border-radius:50%;
+  background:radial-gradient(circle, rgba(0, 242, 254, 0.25), transparent 62%);filter:blur(8px)}
+.hero-art img{width:min(42vw,460px);filter:drop-shadow(0 30px 50px rgba(0,0,0,.6))}
+.scrollcue{position:absolute;left:50%;bottom:1.6rem;translate:-50% 0;z-index:4;
+  font-family:"Cinzel";letter-spacing:.3em;font-size:.62rem;text-transform:uppercase;
+  color:var(--ink-faint);display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.scrollcue .ln{width:1px;height:34px;background:linear-gradient(var(--gold),transparent);animation:cue 2.4s var(--ease) infinite}
+@keyframes cue{0%,100%{opacity:.3;transform:scaleY(.6)}50%{opacity:1;transform:scaleY(1)}}
+
+.ember{position:absolute;bottom:-10px;width:4px;height:4px;border-radius:50%;z-index:1;
+  background:radial-gradient(circle,var(--gold-bright),var(--ember) 70%,transparent);
+  filter:blur(.4px);opacity:0;animation:rise linear infinite}
+@keyframes rise{0%{transform:translateY(0) scale(.6);opacity:0}
+  12%{opacity:.9}85%{opacity:.5}100%{transform:translateY(-92vh) scale(1.1);opacity:0}}
+
+@media(max-width:880px){
+  .hero .wrap{grid-template-columns:1fr;text-align:center;gap:1.4rem;padding-block:6.5rem}
+  .hero-text{max-width:none;margin-inline:auto}
+  .hero h1{margin-inline:auto}
+  .kicker,.byline{justify-content:center}
+  .hero .blurb{margin-inline:auto}
+  .hero-art{order:-1}
+  .hero-art img{width:min(64vw,320px)}
+}
+
+/* ============ generic section scaffold ============ */
+section{position:relative}
+.sheet{position:relative;background:var(--parch)}
+.sheet.alt{background:linear-gradient(180deg,var(--parch),var(--parch-2))}
+.band{padding-block:clamp(3.6rem,8vw,6.4rem)}
+
+.chapter{display:flex;align-items:baseline;gap:1.1rem;margin-bottom:2.2rem;flex-wrap:wrap}
+.chapter .no{font-family:"Cinzel";font-weight:800;font-size:clamp(2.2rem,6vw,3.6rem);
+  color:transparent;-webkit-text-stroke:2px var(--gold-deep);line-height:.8;opacity:.45}
+.chapter h2{font-size:var(--fs-h2);color:var(--ink);text-wrap:balance}
+.chapter .sub{flex-basis:100%;font-size:var(--fs-lead);color:var(--ink-faint);font-style:italic;
+  max-width:54ch;margin-top:.2rem}
+.eyebrow{font-family:"Cinzel";font-weight:600;letter-spacing:.26em;text-transform:uppercase;
+  font-size:.72rem;color:var(--gold-deep);display:inline-flex;align-items:center;gap:.6rem;margin-bottom:.7rem}
+.eyebrow::before{content:"";width:1.6rem;height:2px;background:var(--gold-deep)}
+
+.lead{font-size:var(--fs-lead);line-height:1.45;color:var(--ink-soft);max-width:62ch}
+.note{color:var(--ink-faint)}
+hr.rule{border:none;height:1px;margin:2.6rem 0;
+  background:linear-gradient(90deg,transparent,var(--parch-edge),transparent)}
+
+.panel{position:relative;background:var(--iron-2);
+  border:1px solid var(--parch-edge);border-radius:14px;
+  padding:clamp(1.2rem,2.6vw,2rem);
+  box-shadow:0 4px 12px rgba(0,0,0,.25);}
+.panel.foil{border-color:transparent;
+  background:
+    var(--iron-2) padding-box,
+    linear-gradient(135deg, var(--gold), var(--gold-deep) 45%, var(--gold-bright)) border-box;
+  border:2px solid transparent}
+
+/* ============ §1 FORGING PATH ============ */
+.path{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem 1.1rem;margin-top:.6rem}
+.path .grp-h{grid-column:1/-1;font-family:"Cinzel";font-weight:600;letter-spacing:.18em;
+  text-transform:uppercase;font-size:.74rem;color:var(--ink-faint);
+  display:flex;align-items:center;gap:.8rem;margin-top:1.2rem}
+.path .grp-h::after{content:"";flex:1;height:1px;background:var(--parch-edge)}
+.step{position:relative;display:flex;align-items:center;gap:.95rem;
+  background:var(--iron-2);
+  border:1px solid var(--parch-edge);border-radius:12px;padding:.7rem .9rem;
+  transition:transform .35s var(--ease), box-shadow .35s var(--ease), border-color .35s}
+.step:hover{transform:translateY(-3px);border-color:var(--gold);
+  box-shadow:0 12px 24px rgba(0, 242, 254, 0.15)}
+.step .rk{font-family:"Cinzel";font-weight:800;font-size:1.5rem;color:var(--gold-deep);
+  min-width:1.5ch;text-align:center;opacity:.85}
+.step .ico{width:54px;height:54px;flex:none;object-fit:contain;}
+.step .nm{flex:1;min-width:0;overflow-wrap:break-word;font-weight:600;font-size:1.02rem;line-height:1.15;color:var(--ink)}
+.step .nm small{display:block;font-size:.74rem;color:var(--ink-faint);font-weight:400;font-style:italic}
+
+@media(max-width:680px){.path{grid-template-columns:1fr 1fr}.step .nm{font-size:.92rem}.step .ico{width:46px;height:46px}.step{gap:.65rem;padding:.6rem .7rem}}
+@media(max-width:560px){.path{grid-template-columns:1fr}.step .ico{width:50px;height:50px}.step{gap:.85rem}}
+
+/* ============ §2 FUNDAMENTALS ============ */
+.split{display:grid;grid-template-columns:1.25fr .95fr;gap:var(--gap);align-items:start}
+@media(max-width:820px){.split{grid-template-columns:1fr}}
+.deflist{display:grid;gap:1rem;margin-top:.4rem}
+.deflist .row{display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start;
+  padding-bottom:1rem;border-bottom:1px dashed var(--parch-edge)}
+.deflist .row:last-child{border-bottom:none;padding-bottom:0}
+.deflist .ico{width:50px;height:50px;object-fit:contain;}
+.deflist h4{font-family:"Cinzel";font-size:1.05rem;color:var(--ink);margin-bottom:.15rem;letter-spacing:.02em}
+.deflist p{color:var(--ink-soft);font-size:.98rem}
+
+.gates{display:grid;gap:1rem}
+.gate{position:relative;padding:1.1rem 1.2rem 1.1rem 1.4rem;border-radius:12px;
+  background:var(--iron-2);
+  border:1px solid var(--parch-edge);border-left:4px solid var(--gold)}
+.gate.imb{border-left-color:var(--royal)}
+.gate .tag{font-family:"Cinzel";font-weight:700;letter-spacing:.06em;font-size:1.02rem;display:flex;
+  align-items:center;justify-content:space-between;gap:.6rem;color:var(--ink)}
+.gate .req{font-family:"Cinzel";font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--gold);color:#111625;padding:.22rem .55rem;border-radius:6px;font-weight:700;white-space:nowrap}
+.gate.imb .req{background:var(--royal);color:#fff}
+.gate p{color:var(--ink-soft);font-size:.95rem;margin-top:.35rem}
+
+figure.shot{margin:0;border-radius:14px;overflow:hidden;background:var(--iron-2);
+  border:1px solid var(--parch-edge);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+figure.shot img{width:100%;display:block}
+figure.shot figcaption{font-family:"Cinzel";font-size:.78rem;letter-spacing:.04em;
+  color:var(--ink-faint);padding:.7rem .9rem;background:var(--iron-3)}
+
+.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+@media(max-width:900px){.gallery{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.gallery{grid-template-columns:1fr}}
+.gallery figure.shot{margin:0}
+
+.heroes{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:.6rem}
+@media(max-width:760px){.heroes{grid-template-columns:1fr 1fr}}
+.hcard{border-radius:14px;overflow:hidden;border:1px solid var(--parch-edge);background:var(--iron-2);
+  text-align:center;transition:transform .35s var(--ease),box-shadow .35s var(--ease),border-color .35s}
+.hcard:hover{transform:translateY(-3px);border-color:var(--gold);box-shadow:0 12px 24px rgba(0, 242, 254, 0.15)}
+.hcard img{width:100%;aspect-ratio:1;object-fit:cover;background:var(--parch-2)}
+.hcard .nm{font-family:"Cinzel";font-weight:700;font-size:1.02rem;margin:.55rem 0 .1rem;color:var(--ink)}
+.hcard .st{font-family:"Cinzel";font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
+  padding-bottom:.7rem;display:block}
+.hcard.let .st { color: var(--cav); } 
+.hcard.atk .st { color: var(--ember); }
+
+.avoid{display:grid;gap:.9rem;margin-top:.4rem}
+.avoid .a{padding:1rem 1.2rem;border-radius:12px;background:var(--iron-2);border:1px solid var(--parch-edge);
+  border-left:4px solid var(--ember)}
+.avoid .a .t{font-family:"Cinzel";font-weight:700;letter-spacing:.04em;color:var(--ember);display:flex;
+  justify-content:space-between;gap:.6rem;flex-wrap:wrap}
+.avoid .a .who{font-weight:700;color:var(--ink)}
+.avoid .a p{color:var(--ink-soft);font-size:.95rem;margin-top:.3rem}
+.thrud{margin-top:1.4rem;border-left-color:var(--arc)}
+.thrud .t{color:var(--royal)}
+
+.dmg{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.4rem 0}
+@media(max-width:680px){.dmg{grid-template-columns:1fr}}
+.dmg .c{border-radius:14px;padding:1.2rem 1.3rem;border:2px solid var(--parch-edge);background:var(--iron-2);text-align:center}
+.dmg .c.best{border-color:var(--royal);background:linear-gradient(180deg, var(--iron-2), rgba(179,55,255,0.05))}
+.dmg .c .mix{font-family:"Cinzel";font-weight:700;font-size:.92rem;color:var(--ink);min-height:2.6em}
+.dmg .c .big{font-family:"Cinzel";font-weight:900;font-size:2.4rem;line-height:1;margin:.5rem 0 .2rem;color:var(--gold-deep)}
+.dmg .c.best .big{color:var(--gold)}
+.dmg .c .pct{font-style:italic;color:var(--ink-faint);font-size:.9rem}
+.formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86rem;line-height:1.7;
+  background:#111625;color:var(--gold);border-radius:12px;padding:1.1rem 1.3rem;overflow-x:auto;
+  border:1px solid var(--parch-edge)}
+.formula .k{color:var(--gold-deep)} .formula .n{color:var(--ember)}
+.tldr{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1rem;font-family:"Cinzel";font-weight:600}
+.tldr .pill{padding:.3rem .7rem;border-radius:999px;border:1px solid var(--parch-edge);background:var(--iron-3)}
+.tldr .pill.let{color:var(--cav)} .tldr .pill.atk{color:var(--ember)}
+.tldr .op{color:var(--ink-faint)}
+
+.tp{display:grid;gap:.7rem;margin:1.2rem 0}
+.tp .row{display:grid;grid-template-columns:7rem 1fr auto;gap:.8rem;align-items:center}
+.tp .row .lbl{font-family:"Cinzel";font-weight:700;letter-spacing:.04em}
+.tp .bar{height:16px;border-radius:999px;background:var(--parch-2);overflow:hidden;border:1px solid var(--parch-edge)}
+.tp .bar i{display:block;height:100%}
+.tp .row.arc .lbl{color:var(--arc)} .tp .row.arc .bar i{width:100%;background:var(--arc)}
+.tp .row.cav .lbl{color:var(--cav)} .tp .row.cav .bar i{width:62%;background:var(--cav)}
+.tp .row.inf .lbl{color:var(--ink-faint)} .tp .row.inf .bar i{width:6%;background:var(--ink-faint)}
+.tp .row .v{font-family:"Cinzel";font-weight:700;font-size:.82rem;color:var(--ink-soft)}
+
+/* ============ §3 THE RULE (dark drama) ============ */
+.rule-band{position:relative;color:var(--ink);overflow:hidden;isolation:isolate;
+  background:
+    radial-gradient(90% 120% at 85% 100%, rgba(0, 242, 254, 0.1), transparent 55%),
+    linear-gradient(160deg, var(--iron-2), var(--parch) 70%);}
+.rule-band::before{content:"";position:absolute;inset:0;background-image:var(--noise);
+  background-size:240px;opacity:.05;mix-blend-mode:overlay;z-index:0}
+.rule-band .wrap{position:relative;z-index:2}
+.rule-band .eyebrow{color:var(--gold)}
+.rule-band .eyebrow::before{background:var(--gold)}
+.rule-band h2{font-size:var(--fs-h2);color:var(--ink);text-wrap:balance}
+.rule-hl{color:transparent;background:linear-gradient(var(--gold-bright),var(--gold-deep));
+  -webkit-background-clip:text;background-clip:text}
+.sets{display:flex;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.setcard{flex:1 1 160px;border-radius:14px;padding:1.1rem 1.2rem;
+  background:var(--iron-2);border:1px solid var(--parch-edge);
+  backdrop-filter:blur(2px)}
+.setcard .lab{font-family:"Cinzel";font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:.78rem}
+.setcard.inf .lab{color:var(--inf)}
+.setcard.arc .lab{color:var(--arc)}
+.setcard.cav .lab{color:var(--cav)}
+.setcard p{font-size:.92rem;color:var(--ink-soft);margin-top:.3rem}
+.setcard .one{font-family:"Cinzel";font-weight:800;font-size:1.5rem;color:var(--gold)}
+.reasons{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:1.4rem}
+.reasons .r{border-top:2px solid var(--parch-edge);padding-top:.9rem}
+.reasons .r h4{font-family:"Cinzel";font-size:.96rem;color:var(--gold);letter-spacing:.04em;margin-bottom:.35rem}
+.reasons .r p{color:var(--ink-soft);font-size:.94rem}
+@media(max-width:760px){.reasons{grid-template-columns:1fr}}
+
+/* ============ INTERFACE FOR REDIRECT LAYER ============ */
+.redirect-box {
+  margin: 40px 0;
+  padding: 30px;
+  background: var(--iron-2);
+  border: 1px solid var(--parch-edge);
+  border-top: 3px solid var(--gold);
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+.btn-next-page {
+  font-family: "Cinzel", serif;
+  background: linear-gradient(90deg, var(--gold-deep) 0%, var(--gold) 100%);
+  color: #111625 !important;
+  font-weight: 800;
+  font-size: 1.1rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 36px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 15px rgba(0, 242, 254, 0.3);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  border: none;
+  margin-top: 15px;
+}
+.btn-next-page:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 6px 20px rgba(0, 242, 254, 0.5);
+}
+
+/* ============ COLOPHON ============ */
+.fin{position:relative;color:var(--ink);text-align:center;overflow:hidden;
+  background:linear-gradient(180deg, var(--iron) , #0a0e1a);}
+.fin::before{content:"";position:absolute;inset:0;background-image:var(--noise);background-size:240px;opacity:.05;mix-blend-mode:overlay}
+.fin .wrap{position:relative;z-index:2;padding-block:clamp(4rem,9vw,7rem)}
+.fin .word{font-family:"Cinzel";font-weight:900;font-size:clamp(3rem,12vw,7rem);letter-spacing:.1em;
+  color:transparent;background:linear-gradient(var(--gold-bright),var(--gold-deep));
+  -webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 8px 20px rgba(0,0,0,0.5))}
+.fin .sincerely{font-style:italic;color:var(--ink-faint);margin-top:.6rem;font-size:1.15rem}
+.fin .who{font-family:"Cinzel";font-weight:600;letter-spacing:.06em;color:var(--gold);font-size:1.25rem;margin-top:.2rem}
+.fin .card{margin:2rem auto 0;max-width:420px;border-radius:14px;overflow:hidden;
+  box-shadow:0 24px 50px rgba(0,0,0,0.5); border:1px solid var(--parch-edge)}
+.fin .meta{margin-top:1.6rem;font-size:.82rem;letter-spacing:.04em;color:var(--ink-faint);line-height:1.8}
+.fin .meta a{color:var(--gold)}
+.totop{display:inline-flex;align-items:center;gap:.5rem;margin-top:1.6rem;font-family:"Cinzel";
+  letter-spacing:.16em;text-transform:uppercase;font-size:.7rem;color:var(--gold);
+  text-decoration:none;border:1px solid var(--parch-edge);border-radius:999px;padding:.55rem 1.1rem;transition:.25s}
+.totop:hover{background:rgba(0, 242, 254, 0.1);color:var(--ink)}
+
+/* ============ language switcher ============ */
+body{top:0 !important}
+body > .skiptranslate{display:none !important}
+.goog-te-banner-frame.skiptranslate{display:none !important}
+#google_translate_element{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
+
+.lang-fab{position:fixed;top:23px;right:clamp(.8rem,3vw,1.4rem);z-index:130;transform:translateY(-50%);
+  display:inline-flex;align-items:center;gap:.45rem;cursor:pointer;
+  font-family:"Cinzel",serif;font-weight:700;font-size:.78rem;letter-spacing:.08em;
+  color:#111625;background:linear-gradient(180deg,var(--gold-bright),var(--gold-deep));
+  border:1px solid var(--parch-edge);border-radius:999px;padding Tram:.4rem .72rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.4);
+  transition:transform .25s var(--ease), box-shadow .25s var(--ease)}
+.lang-fab:hover{transform:translateY(calc(-50% - 1px));box-shadow:0 6px 18px rgba(0, 242, 254, 0.3)}
+.lang-fab .flag{font-size:1.05rem;line-height:1}
+@media(max-width:600px){.lang-fab .code{display:none}.lang-fab{padding:.5rem .55rem}}
+
+.lang-overlay{display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(17, 22, 37, 0.85);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:1.2rem}
+.lang-overlay.active{display:flex}
+.lang-dialog{position:relative;border-radius:16px;padding:1.4rem;
+  max-width:460px;width:100%;max-height:82vh;overflow-y:auto;
+  background:var(--iron-2);
+  border:2px solid var(--parch-edge);box-shadow:0 30px 60px rgba(0,0,0,0.6)}
+.lang-dialog-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem}
+.lang-dialog-head h3{font-family:"Cinzel";font-size:1.05rem;letter-spacing:.06em;color:var(--ink)}
+.lang-close{background:none;border:none;color:var(--ink-faint);font-size:1.3rem;line-height:1;
+  cursor:pointer;padding:.1rem .4rem;border-radius:8px}
+.lang-close:hover{color:var(--ember);background:var(--iron-3)}
+.lang-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem}
+@media(max-width:480px){.lang-grid{grid-template-columns:1fr}}
+.lang-opt{display:flex;align-items:center;gap:.6rem;padding:.55rem .7rem;border-radius:10px;
+  border:1px solid var(--parch-edge);background:var(--iron-3);cursor:pointer;
+  font-family:"Spectral",serif;font-size:.92rem;color:var(--ink-soft);text-align:left;
+  transition:border-color .15s, background .15s, transform .15s}
+.lang-opt:hover{border-color:var(--gold);background:var(--iron-2);transform:translateY(-1px)}
+.lang-opt.active{border-color:var(--gold);background:var(--iron-2)}
+.lang-opt .flag{font-size:1.15rem;line-height:1}
+.lang-opt .name{flex:1}
+
+.vswitch{position:fixed;top:11px;left:50%;transform:translateX(-50%);z-index:140;display:flex;align-items:center;gap:.3rem;
+  padding:4px 5px;border-radius:999px;background:rgba(26, 33, 51, 0.9);backdrop-filter:blur(8px);
+  border:1px solid var(--parch-edge);box-shadow:0 4px 14px rgba(0,0,0,0.4);font-family:"Cinzel",serif;transition:transform .35s var(--ease)}
+.vswitch.tuck{transform:translateX(-50%) translateY(-170%)}
+.vswitch .vlab{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);padding-left:.5rem;font-weight:600}
+.vswitch .vopt{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;padding:.32rem .7rem;border-radius:999px;
+  color:var(--ink-soft);text-decoration:none;white-space:nowrap;transition:.2s;cursor:pointer}
+.vswitch .vopt.active{background:linear-gradient(180deg,var(--gold-bright),var(--gold-deep));color:#111625;box-shadow:inset 0 1px 0 rgba(255,255,255,0.3)}
+.vswitch .vopt:not(.active):hover{color:#fff;background:rgba(0, 242, 254, 0.15)}
+@media(max-width:600px){.vswitch .vlab{display:none}.vswitch .vopt{font-size:.62rem;padding:.3rem .55rem}}
+
+[data-rv]{opacity:0;transform:translateY(26px);transition:opacity .8s var(--ease), transform .8s var(--ease)}
+[data-rv].in{opacity:1;transform:none}
+[data-rv].d1{transition-delay:.08s}[data-rv].d2{transition-delay:.16s}
+[data-rv].d3{transition-delay:.24s}[data-rv].d4{transition-delay:.32s}
+</style>
+</head>
+<body class="grain">
+<div id="progress"></div>
+
+<!-- NAVIGATION INTEGRATION SYSTEM -> REPLACED WITH INDEX2.HTML LINK -->
+<div class="vswitch notranslate" role="group" aria-label="Choose a version">
+  <span class="vlab"></span>
+  <span class="vopt active" aria-current="page">Almanac</span>
+  <a class="vopt" href="index2.html">Cheat sheet</a>
+</div>
+
+<!-- language switcher -->
+<button class="lang-fab notranslate" id="langFab" aria-haspopup="dialog" aria-expanded="false" aria-label="Change language">
+  <span class="flag" id="langFlag">🇺🇸</span><span class="code" id="langCode">EN</span>
+</button>
+<div class="lang-overlay" id="langOverlay" role="dialog" aria-modal="true" aria-label="Select language">
+  <div class="lang-dialog">
+    <div class="lang-dialog-head">
+      <h3 class="notranslate">Select Language</h3>
+      <button class="lang-close notranslate" id="langClose" aria-label="Close">✕</button>
+    </div>
+    <div class="lang-grid" id="langGrid"></div>
+  </div>
+</div>
+<div id="google_translate_element" aria-hidden="true"></div>
+
+<header id="bar" aria-label="Chapter navigation">
+  <img class="crest" src="assets/logo-kingshot.png" alt="Kingshot">
+  <span class="btitle">How 2 Bear Hunt</span>
+  <nav aria-label="Chapters">
+    <a href="#join">Join</a>
+    <a href="#skill">The Skill</a>
+    <a href="#skip">Skips</a>
+    <a href="#heroes">Heroes</a>
+    <a href="#avoid">Tier List</a>
+    <a href="#math">The Math</a>
+    <a href="#balance">Balance</a>
+    <a href="#formations">Formations</a>
+  </nav>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="hero-text">
+      <div class="kicker" data-rv>
+        <img src="assets/logo-kingshot.png" alt="Kingshot logo">
+        <span>Bear Hunt Almanac</span>
+      </div>
+      <h1 class="d1" data-rv><span class="small">Proper Way For</span><span class="word">Bear Hunt</span></h1>
+      <p class="blurb" data-rv style="--d:2">Joining right is most of your rally damage. Who to bring, the one skill that counts, and the math that makes a rally <em>hit</em>.</p>
+    </div>
+    <div class="hero-art d2" data-rv>
+      <span class="glow"></span>
+      <img src="assets/hero-render.jpg" alt="Bear Hunt Rally Hero">
+    </div>
+  </div>
+  <div class="scrollcue" aria-hidden="true"><span>Read</span><span class="ln"></span></div>
+</section>
+
+<!-- ============ §1 JOIN A RALLY ============ -->
+<section class="sheet band" id="join">
+  <div class="wrap">
+    <div class="eyebrow" data-rv>Chapter I</div>
+    <div class="chapter" data-rv>
+      <span class="no">01</span>
+      <h2>Join a rally properly</h2>
+      <p class="sub">Three things decide whether your join actually helps: which slot, which heroes, and what fills your march.</p>
+    </div>
+    <div class="split">
+      <div data-rv>
+        <div class="deflist">
+          <div class="row">
+            <img class="ico" src="assets/portrait-yeonwoo.png" alt="Yeonwoo">
+            <div><h4>Joiner goes in slot 1</h4><p>Your joiner hero takes the <strong>first slot</strong> - the one carrying the little flag icon. That is the hero the rally reads.</p></div>
+          </div>
+          <div class="row">
+            <img class="ico" src="assets/ic-xp-enhancement.png" alt="XP">
+            <div><h4>Slots 2 and 3 are for XP</h4><p>The other two heroes do not change the rally bonus, but give them a <strong>high XP level</strong> so you bring more troops.</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="d1" data-rv>
+        <div class="panel foil">
+          <p style="margin:0"><strong>More archers = more damage.</strong> Make sure <em>every single march</em> you send into a Bear Hunt has archers in it. The why is in <a href="#formations">Formations</a>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ §2 THE SKILL ============ -->
+<section class="sheet alt band" id="skill">
+  <div class="wrap">
+    <div class="eyebrow" data-rv>Chapter II</div>
+    <div class="chapter" data-rv>
+      <span class="no">02</span>
+      <h2>The only skill that matters</h2>
+      <p class="sub">As a joiner, exactly one number on your hero counts. Everything else is noise.</p>
+    </div>
+    <div class="split" style="align-items:center">
+      <div data-rv>
+        <p class="lead">It is always the <strong>Expedition skill on the top-right</strong> of your joiner hero - that skill and its <strong>skill level</strong> are all the rally reads.</p>
+        <div class="gates" style="margin-top:1.4rem">
+          <div class="gate">
+            <div class="tag">Gear on joiners <span class="req">does nothing</span></div>
+            <p>Strip the gear off your joiner heroes and feed it into your three rally leaders instead.</p>
+          </div>
+          <div class="gate imb">
+            <div class="tag">Joiner cap <span class="req">4 max</span></div>
+            <p>Only up to <strong>four joiners</strong> contribute to the overall rally bonus.</p>
+          </div>
+        </div>
+      </div>
+      <figure class="d1 shot" data-rv>
+        <img src="assets/shot-expedition-skill.jpg" alt="Expedition Skill">
+        <figcaption>The circled skill - top-right, Expedition - is the only one that counts.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ §3 SKIP ============ -->
+<section class="rule-band band" id="skip">
+  <div class="wrap">
+    <div class="eyebrow" data-rv>Chapter III</div>
+    <h2>Skills <span class="rule-hl">skip</span>, stars don't count.</h2>
+    <p class="lead" style="margin-top:1rem">Two rules run the joiner queue: higher skill levels skip lower ones, and troop capacity comes from XP - never from stars.</p>
+    <div class="reasons">
+      <div class="r" data-rv><h4>Higher level skips lower</h4><p>A <strong>Lv5</strong> joiner skill skips Lv1, 2, 3 and 4. If your skill level is lower than the other joiners, <strong>it gets skipped</strong>.</p></div>
+      <div class="r d1" data-rv><h4>XP = troop capacity</h4><p>Always join with your <strong>highest XP-level</strong> hero. More XP means more troops, and <strong>more troops = more points</strong>.</p></div>
+      <div class="r d2" data-rv><h4>Stars are irrelevant</h4><p><strong>Star level does not affect troop capacity.</strong> Don't pick a joiner by stars.</p></div>
+    </div>
+    <div class="sets" style="margin-top:2rem">
+      <div class="setcard arc" data-rv><div class="lab">Skip ladder</div><span class="one">Lv5 → skips 1-4</span><p>Bring a low-skill hero on purpose only if you want its skill skipped.</p></div>
+      <div class="setcard cav d1" data-rv><div class="lab">Jaeger Option</div><span class="one">Lv3 skill</span><p>Purely for capacity - his Lv3 skill is skipped by any Lv4+.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ §4 HEROES ============ -->
+<section class="sheet band" id="heroes">
+  <div class="wrap">
+    <div class="eyebrow" data-rv>Chapter IV</div>
+    <div class="chapter" data-rv>
+      <span class="no">04</span>
+      <h2>Who to join with</h2>
+      <p class="sub">Four heroes, two stat families. Bring these and nothing else.</p>
+    </div>
+    <div class="heroes">
+      <div class="hcard let" data-rv><img src="assets/portrait-yeonwoo.png" alt="Yeonwoo"><div class="nm">Yeonwoo</div><span class="st">Lethality</span></div>
+      <div class="hcard let d1" data-rv><img src="assets/portrait-chenko.png" alt="Chenko"><div class="nm">Chenko</div><span class="st">Lethality</span></div>
+      <div class="hcard atk d2" data-rv><img src="assets/portrait-margot.png" alt="Margot"><div class="nm">Margot</div><span class="st">Attack</span></div>
+      <div class="hcard atk d3" data-rv><img src="assets/portrait-amane.png" alt="Amane"><div class="nm">Amane</div><span class="st">Attack</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ §5 TIER LIST & AVOID ============ -->
+<section class="sheet alt band" id="avoid">
+  <div class="wrap">
+    <div class="eyebrow" data-rv>Chapter V</div>
+    <div class="chapter" data-rv>
+      <span class="no">05</span>
+      <h2>The tier list, and who to avoid</h2>
+      <p class="sub">These heroes either roll the dice, or do nothing at all. Keep them out of real rallies.</p>
+    </div>
+    <figure class="shot" data-rv style="margin-bottom:1.8rem">
+      <img src="assets/tier-list.png" alt="Tier List Matrix">
+      <figcaption>Bear Hunt joiner tier list.</figcaption>
+    </figure>
+    <div class="avoid">
+      <div class="a" data-rv><div class="t"><span class="who">Rosa, Marlin, Petra, Jaeger, Jabel</span><span>Chance-based</span></div><p>Damage <strong>does not stack</strong> and output is <strong>randomly generated</strong>.</p></div>
+      <div class="a" data-rv><div class="t"><span class="who">Zoe, Saul, Alcar, Eric</span><span>No damage</span></div><p>They only have a defensive skill - they don't increase damage at all.</p></div>
+      <div class="a" data-rv><div class="t"><span class="who">Any blue (R) heroes</span><span>Gathering only</span></div><p>Their skills only help gather resources. Nothing for a rally.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ §6 THE MATH ============ -->
+<section class="sheet band" id="math">
+  <div class="wrap">
+    <div class="eyebrow" data-rv>Chapter VI</div>
+    <div class="chapter" data-rv>
+      <span class="no">06</span>
+      <h2>Different heroes hit harder</h2>
+      <p class="sub">Same joiners add up. Different joiners multiply. Mixing stat families is free damage.</p>
+    </div>
+
+    <!-- 1. Perbaikan Susunan Baris Kartu Atas -->
+    <div class="dmg">
+      <div class="c" data-rv>
+        <div class="mix">4 identical heroes<br><small>(e.g. 4× Amane)</small></div>
+        <div class="big">2.0×</div>
+        <div class="pct">+100% boost · additive</div>
+      </div>
+      <div class="c d1" data-rv>
+        <div class="mix">2 Amane + 2 Chenko</div>
+        <div class="big">2.25×</div>
+        <div class="pct">+125% boost · two families</div>
+      </div>
+      <div class="c best d2" data-rv>
+        <div class="mix">1 Chenko + 1 Amane + 1 Margot + 1 Yeonwoo</div>
+        <div class="big">2.5×</div>
+        <div class="pct">+150% boost · fully mixed</div>
+      </div>
+    </div>
+
+    <p class="lead" data-rv>That's a <strong>12.5% relative increase</strong> just from mixing instead of stacking one hero. Here's why:</p>
+
+    <!-- 2. Perbaikan Pemisahan Grid Tata Letak Kiri-Kanan (.split) -->
+    <div class="split" style="align-items:center;margin-top:1rem">
+      <!-- Kolom Kiri: Murni untuk Kotak Rumus saja -->
+      <div data-rv>
+        <div class="formula">
+<span class="k">damageUp</span> = math.prod(1 + v/100 for v in DamageUp.values())<br><br>
+same op  → {102: <span class="n">100</span>}        → 1 + 100/100 = <span class="n">2.0</span><br>
+two ops  → {101: <span class="n">50</span>, 102: <span class="n">50</span>} → 1.5 × 1.5 = <span class="n">2.25</span>
+        </div>
+      </div>
+
+      <!-- Kolom Kanan: Untuk Penjabaran Catatan Taktis & Indikator TL;DR -->
+      <div class="d1" data-rv>
+        <p class="note">Each unique <strong>effect_op</strong> is multiplied separately. Same op? The buffs just add. Different ops? They compound. Basically: join with a different hero, get more damage.</p>
+        <div class="tldr">
+          <span class="pill let">Lethality</span><span class="op">+</span><span class="pill let">Lethality</span>
+          <span class="op">// additive</span>
+        </div>
+        <div class="tldr">
+          <span class="pill let">Lethality</span><span class="op">×</span><span class="pill atk">Attack</span>
+          <span class="op">// multiplicative</span>
+        </div>
+        <p class="note" style="margin-top:.9rem">If a rally is <strong>only</strong> lethality or <strong>only</strong> attack, you do less. Add Amane or Margot when you see only Chenko & Yeonwoo, and vice versa (up to 4 heroes).</p>
+      </div>
+    </div>
+
+    <!-- Kredit di bagian paling bawah bagian -->
+    <p class="credit" data-rv>Damage math credit: <strong>Daryl</strong> from <a href="https://kingshotguides.com">Kingshotguides.com</a>.</p>
+  </div>
+</section>
+<!-- ============ §7 BALANCE ============ -->
+<section class="sheet alt band" id="balance">
+  <div class="wrap">
+    <div class="eyebrow" data-rv>Chapter VII</div>
+    <div class="chapter" data-rv>
+      <span class="no">07</span>
+      <h2>Balance the rally</h2>
+      <p class="sub">Two jobs: joiners read what a rally needs, leaders police what's in theirs.</p>
+    </div>
+    
+    <div class="gov">
+      <div data-rv>
+        <div class="spend">
+          <div class="who f2p" style="background:var(--iron-2); border:1px solid var(--parch-edge); padding:.95rem 1.1rem; border-radius:12px; margin-bottom:15px;">
+            <div class="t" style="font-family:'Cinzel'; font-weight:700; letter-spacing:.05em; color:var(--arc); margin-bottom:.25rem;">If you're a joiner</div>
+            <p style="color:var(--ink-soft); font-size:.95rem;">Read what the rally <strong>needs</strong>. If it already has a Chenko & Yeonwoo, join with <strong>Margot or Amane</strong> (and vice versa). Save your Hilde or low-skill hero for weaker rallies. Stop dumping trash joiners or tiny troop counts into strong rallies.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="d1" data-rv>
+        <div class="spend">
+          <div class="who whale" style="background:var(--iron-2); border:1px solid var(--parch-edge); padding:.95rem 1.1rem; border-radius:12px; margin-bottom:15px;">
+            <div class="t" style="font-family:'Cinzel'; font-weight:700; letter-spacing:.05em; color:var(--ember); margin-bottom:.25rem;">If you're a rally leader</div>
+            <p style="color:var(--ink-soft); font-size:.95rem;">Monitor your own rally. <strong>Kick</strong> any hero from the <a href="#avoid" style="color:var(--gold);">avoid list</a>. Speak up in chat if it's unbalanced. Check your <strong>active rally bonuses</strong> (e.g. 2/4 attack, 2/4 lethality).</p>
+          </div>
+          <div class="who" style="background:var(--iron-2); border:1px solid var(--parch-edge); padding:.95rem 1.1rem; border-radius:12px;">
+            <div class="t" style="font-family:'Cinzel'; font-weight:700; letter-spacing:.05em; color:var(--ink); margin-bottom:.25rem;">But don't over-kick</div>
+            <p style="color:var(--ink-soft); font-size:.95rem;">Do <strong>not</strong> kick someone for the "wrong" joiner hero if their joiner skill <strong>isn't active</strong> - it was skipped (see <a href="#skip" style="color:var(--gold);">Chapter III</a>).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ §8 FORMATIONS ============ -->
+<section class="sheet band" id="formations">
+  <div class="wrap">
+    <div class="eyebrow" data-rv>Chapter VIII</div>
+    <div class="chapter" data-rv>
+      <span class="no">08</span>
+      <h2>Build your formations</h2>
+      <p class="sub">Archers do the work. Infantry does almost nothing. Set your marches up to send as many archers as you can.</p>
+    </div>
+
+    <div class="tp" data-rv>
+      <div class="row arc"><span class="lbl" style="color:var(--arc);">Archer</span><span class="bar" aria-hidden="true"><i style="width:100%; background:var(--arc);"></i></span><span class="v" style="color:var(--ink-soft);">Most damage</span></div>
+      <div class="row cav"><span class="lbl" style="color:var(--cav);">Cavalry</span><span class="bar" aria-hidden="true"><i style="width:62%; background:var(--cav);"></i></span><span class="v" style="color:var(--ink-soft);">2nd most</span></div>
+      <div class="row inf"><span class="lbl" style="color:var(--ink-faint);">Infantry</span><span class="bar" aria-hidden="true"><i style="width:6%; background:var(--ink-faint);"></i></span><span class="v" style="color:var(--ink-soft);">Little to none</span></div>
+    </div>
+
+    <div class="split" style="align-items:start;margin-top:1.4rem">
+      <div data-rv>
+        <div class="panel foil">
+          <p style="margin:0; color:var(--ink);"><strong>Every formation needs a different hero in the 2nd and 3rd slot.</strong> If you repeat a hero across formations, deploying one will leave another short a hero.</p>
+        </div>
+      </div>
+      <div class="d1" data-rv>
+        <div class="spend">
+          <div class="who f2p" style="background:var(--iron-2); border:1px solid var(--parch-edge); padding:.95rem 1.1rem; border-radius:12px; margin-bottom:15px;">
+            <div class="t" style="font-family:'Cinzel'; font-weight:700; letter-spacing:.05em; color:var(--arc); margin-bottom:.25rem;">Fewer troops</div>
+            <p style="color:var(--ink-soft); font-size:.95rem;">Make 1-2 formations of mostly cavalry + archers (<strong>0/40/60</strong> inf/cav/arc) and use them to join your alliance's strongest rally leaders.</p>
+          </div>
+          <div class="who whale" style="background:var(--iron-2); border:1px solid var(--parch-edge); padding:.95rem 1.1rem; border-radius:12px;">
+            <div class="t" style="font-family:'Cinzel'; font-weight:700; letter-spacing:.05em; color:var(--gold); margin-bottom:.25rem;">Lots of troops</div>
+            <p style="color:var(--ink-soft); font-size:.95rem;">Split your archers <strong>evenly</strong> across all available marches, then fill the rest of each with cavalry.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="cz" data-rv style="font-size:var(--fs-h3);margin:1.8rem 0 .4rem">My formations - feel free to copy them</h3>
+    <p class="note" data-rv style="margin-bottom:1rem">Every formation has a different hero in the 2nd and 3rd slot, so deploying one never leaves another short.</p>
+    <div class="gallery" data-rv>
+      <figure class="shot"><img loading="lazy" src="assets/shot-formation-1.png" alt="Bear Hunt formation 1"></figure>
+      <figure class="shot"><img loading="lazy" src="assets/shot-formation-2.png" alt="Bear Hunt formation 2"></figure>
+      <figure class="shot"><img loading="lazy" src="assets/shot-formation-3.png" alt="Bear Hunt formation 3"></figure>
+      <figure class="shot"><img loading="lazy" src="assets/shot-formation-4.png" alt="Bear Hunt formation 4"></figure>
+      <figure class="shot"><img loading="lazy" src="assets/shot-formation-5.png" alt="Bear Hunt formation 5"></figure>
+      <figure class="shot"><img loading="lazy" src="assets/shot-formation-6.png" alt="Bear Hunt formation 6"></figure>
+      <figure class="shot"><img loading="lazy" src="assets/shot-formation-7.png" alt="Bear Hunt formation 7"></figure>
+      <figure class="shot"><img loading="lazy" src="assets/shot-formation-8.png" alt="Bear Hunt formation 8"></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NEW GATEWAY: REDIRECT MODULE TO INDEX2.HTML ============ -->
+<section class="sheet alt band" style="border-top: 1px solid var(--parch-edge);">
+  <div class="wrap">
+    <div class="redirect-box">
+      <h3 class="cz" style="color:var(--ink);">Finished Reading?</h3>
+      <p style="margin-top: 5px; color:var(--ink-soft);">Access the cheat sheet.</p>
+      <!-- Diarahkan ke berkas manual kedua sebagai navigasi eksternal -->
+      <a href="index2.html" class="btn-next-page">Open Cheat sheet (Part 2) ➔</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COLOPHON ============ -->
+<footer class="fin">
+  <div class="wrap">
+    <a class="totop d2" href="#top">↑ Back to the top</a>
+  </div>
+</footer>
+
+<script>
+// Scroll indicators & dynamic progress bar
+const prog = document.getElementById('progress');
+const bar = document.getElementById('bar');
+const hero = document.querySelector('.hero');
+const vsw = document.querySelector('.vswitch');
+let lastY = 0;
+
+function onScroll(){
+  const h = document.documentElement;
+  const sc = h.scrollTop, max = h.scrollHeight - h.clientHeight;
+  prog.style.width = (max>0 ? (sc/max*100) : 0) + '%';
+  if(sc > hero.offsetHeight - 80) bar.classList.add('show'); else bar.classList.remove('show');
+  if(vsw){ if(sc > 150 && sc > lastY) vsw.classList.add('tuck'); else vsw.classList.remove('tuck'); }
+  lastY = sc;
+}
+addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+// Intersection observer for animation
+const io = new IntersectionObserver((es)=>{
+  es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+},{rootMargin:'0px 0px -8% 0px', threshold:0.12});
+
+document.querySelectorAll('[data-rv]').forEach(el=>{
+  if(el.closest('.hero')){ const d = el.style.getPropertyValue('--d')||0;
+    el.style.transitionDelay = (d*0.12)+'s'; requestAnimationFrame(()=>el.classList.add('in')); }
+  else io.observe(el);
+});
+
+// Particle generators
+document.querySelectorAll('.hero, .rule-band, .fin').forEach(sec=>{
+  const n = sec.classList.contains('hero')?14:8;
+  for(let i=0;i<n;i++){
+    const e=document.createElement('span'); e.className='ember';
+    e.style.left=(Math.random()*100)+'%';
+    e.style.animationDuration=(5+Math.random()*6)+'s';
+    e.style.animationDelay=(-Math.random()*8)+'s';
+    const s=.6+Math.random()*1.4; e.style.width=e.style.height=(3*s)+'px';
+    sec.appendChild(e);
+  }
+});
+</script>
+
+<!-- Custom Language Switcher Script -->
+<script>
+(function(){
+  var LANGUAGES = [
+    {code:'en', flag:'🇺🇸', name:'English'},
+    {code:'id', flag:'🇮🇩', name:'Indonesia'}
+  ];
+  var overlay = document.getElementById('langOverlay');
+  var grid    = document.getElementById('langGrid');
+  var fab     = document.getElementById('langFab');
+  var flagEl  = document.getElementById('langFlag');
+  var codeEl  = document.getElementById('langCode');
+
+  function dataFor(code){
+    var base = (code || 'en').split('-')[0];
+    for (var i=0;i<LANGUAGES.length;i++) if (LANGUAGES[i].code === code || LANGUAGES[i].code === base) return LANGUAGES[i];
+    return null;
+  }
+  function detect(){
+    var m = document.cookie.match(/googtrans=\/en\/([a-zA-Z-]{2,10})/);
+    return (m && m[1]) ? m[1] : 'en';
+  }
+  function updateBtn(code){
+    var d = dataFor(code);
+    flagEl.textContent = d ? d.flag : '🌐';
+    codeEl.textContent = (d ? d.code : code).split('-')[0].toUpperCase();
+  }
+
+  var detected = detect();
+  LANGUAGES.forEach(function(l){
+    var b = document.createElement('button');
+    b.className = 'lang-opt notranslate' + (l.code === detected ? ' active' : '');
+    b.setAttribute('data-lang', l.code);
+    var f = document.createElement('span'); f.className = 'flag'; f.textContent = l.flag;
+    var n = document.createElement('span'); n.className = 'name'; n.textContent = l.name;
+    b.appendChild(f); b.appendChild(n);
+    grid.appendChild(b);
+  });
+  updateBtn(detected);
+
+  fab.addEventListener('click', function(){ overlay.classList.add('active'); });
+  document.getElementById('langClose').addEventListener('click', function(){ overlay.classList.remove('active'); });
+})();
+</script>
+</body>
+</html>
